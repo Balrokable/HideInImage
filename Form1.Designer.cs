@@ -82,6 +82,7 @@
             // 
             textBoxMultiline.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             textBoxMultiline.Location = new Point(591, 12);
+            textBoxMultiline.MaxLength = 0;
             textBoxMultiline.Multiline = true;
             textBoxMultiline.Name = "textBoxMultiline";
             textBoxMultiline.ScrollBars = ScrollBars.Vertical;

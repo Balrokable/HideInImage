@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,30 +12,32 @@ namespace HideInImage
     {
         public HiddenDataController() { }
 
-        public Bitmap InjectDataIntoImage(string binaryToInject, Bitmap currentImageBitmap)
+        public Bitmap InjectDataIntoImage(BitArray binaryToInject, Bitmap currentImageBitmap)
         {
             int bitCounter = 0;
             int remainingBits = binaryToInject.Length;
-            bool endOfData = false;
 
             for (int i = 0; i < currentImageBitmap.Height; i++)
             {
                 for (int j = 0; j < currentImageBitmap.Width; j++)
-                {
-                    if (remainingBits <= 3)
+                {                    
+                    int bitsToTake = Math.Min(3, remainingBits);
+
+                    string bits = "";
+
+                    for(int k = 0; k < bitsToTake; k++)
                     {
-                        endOfData = true;
+                        bits += binaryToInject[bitCounter + k] ? "1" : "0";
                     }
 
-                    int bitsToTake = Math.Min(3, remainingBits);
-                    string bits = binaryToInject.Substring(bitCounter, bitsToTake).PadRight(3, '0');
+                    bits = bits.PadRight(3, '0');
 
-                    currentImageBitmap.SetPixel(j, i, InjectThreeBitsIntoPixel(currentImageBitmap.GetPixel(j, i), bits, endOfData));
+                    currentImageBitmap.SetPixel(j, i, InjectThreeBitsIntoPixel(currentImageBitmap.GetPixel(j, i), bits, (bitsToTake == remainingBits)));
 
                     bitCounter += bitsToTake;
                     remainingBits = binaryToInject.Length - bitCounter;
 
-                    if (endOfData)
+                    if (remainingBits == 0)
                     {
                         return currentImageBitmap;
                     }
@@ -73,9 +77,11 @@ namespace HideInImage
             return toFillUp.PadLeft(8, '0');
         }
 
-        public string ExtractDataFromCurrentImage(Bitmap currentImageBitmap)
+        public BitArray ExtractDataFromCurrentImage(Bitmap currentImageBitmap)
         {
-            string rawBinary = "";
+            List<bool> data = new List<bool>();
+            BitArray empty = new BitArray(0);
+
 
             if (currentImageBitmap != null)
             {
@@ -87,27 +93,40 @@ namespace HideInImage
                         {
                             if (currentImageBitmap.GetPixel(j, i).A != 254)
                             {
-                                rawBinary += ExtractThreeBitsFromPixel(currentImageBitmap.GetPixel(j, i));
+                                string threeBits = ExtractThreeBitsFromPixel(currentImageBitmap.GetPixel(j, i));
+
+                                foreach(char bit in threeBits)
+                                {
+                                    if(bit == '1')
+                                    {
+                                        data.Add(true);
+                                    }
+                                    else
+                                    {
+                                        data.Add(false);
+                                    }
+                                }
                             }
                             else
                             {
-                                return ConvertBinaryStringToString(rawBinary);
+                                BitArray bits = new BitArray(data.ToArray());
+                                return bits;
                             }
                         }
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Current image seems to have no data embedded!");
-                    return "";
+                    MessageBox.Show("Current image seems to have no data embedded!");                    
+                    return empty;
                 }
             }
             else
             {
                 MessageBox.Show("Upload an image first!");
-                return "";
+                return empty;
             }
-            return "";
+            return empty;
         }
 
         private string ExtractThreeBitsFromPixel(Color pixel)
@@ -133,36 +152,6 @@ namespace HideInImage
             }
             return false;
         }
-
-        private string ConvertStringToBinaryString(string input)
-        {
-            byte[] utf8Bytes = Encoding.UTF8.GetBytes(input);
-            StringBuilder sb = new StringBuilder();
-
-            foreach (byte b in utf8Bytes)
-            {
-                sb.Append(Convert.ToString(b, 2).PadLeft(8, '0'));
-            }
-            return sb.ToString();
-        }
-
-        private string ConvertBinaryStringToString(string input)
-        {
-            List<byte> byteList = new List<byte>();
-            int usableLength = input.Length - (input.Length % 8);
-
-            for (int i = 0; i < usableLength; i += 8)
-            {
-                string byteString = input.Substring(i, 8);
-                byteList.Add(Convert.ToByte(byteString, 2));
-            }
-            return Encoding.UTF8.GetString(byteList.ToArray());
-        }
-
-        private void imgPreviewBox_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        
     }
 }

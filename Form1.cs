@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics;
 using System.Text;
 using System.Windows.Forms;
@@ -9,6 +10,7 @@ namespace HideInImage
     {
 
         private HiddenDataController hdc = new HiddenDataController();
+        private BinaryConverter bc = new BinaryConverter();
         private Bitmap currentImageBitmap;
 
         public Form1()
@@ -33,6 +35,7 @@ namespace HideInImage
                         currentImageBitmap = new Bitmap(tempImg);
                         imgPreviewBox.Image = new Bitmap(tempImg);
                     }
+                    textBoxMultiline.Text = "";
                 }
                 catch (Exception ex)
                 {
@@ -51,7 +54,14 @@ namespace HideInImage
 
         private void btn_inject_Click(object sender, EventArgs e)
         {
-            hdc.InjectDataIntoImage(ConvertStringToBinaryString(textBoxMultiline.Text), currentImageBitmap);
+
+            if (currentImageBitmap == null)
+            {
+                MessageBox.Show("Upload an image first!");
+                return;
+            }
+
+            hdc.InjectDataIntoImage(bc.ConvertStringToBitArray(textBoxMultiline.Text), currentImageBitmap);
             lbl_status.Text = "Data injected";
             saveImage(currentImageBitmap);
         }
@@ -72,20 +82,15 @@ namespace HideInImage
 
         private void btn_extract_Click(object sender, EventArgs e)
         {
-            textBoxMultiline.Text = hdc.ExtractDataFromCurrentImage(currentImageBitmap);
-            lbl_status.Text = "Data extracted";
-        }
 
-        private string ConvertStringToBinaryString(string input)
-        {
-            byte[] utf8Bytes = Encoding.UTF8.GetBytes(input);
-            StringBuilder sb = new StringBuilder();
-
-            foreach (byte b in utf8Bytes)
+            if (currentImageBitmap == null)
             {
-                sb.Append(Convert.ToString(b, 2).PadLeft(8, '0'));
+                MessageBox.Show("Upload an image first!");
+                return;
             }
-            return sb.ToString();
-        }
+
+            textBoxMultiline.Text = bc.ConvertBitArrayToString(hdc.ExtractDataFromCurrentImage(currentImageBitmap));
+            lbl_status.Text = "Data extracted";
+        }        
     }
 }
