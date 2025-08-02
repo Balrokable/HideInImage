@@ -105,10 +105,11 @@
             lbl_infoSpace.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lbl_infoSpace.AutoSize = true;
             lbl_infoSpace.Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lbl_infoSpace.Location = new Point(12, 371);
+            lbl_infoSpace.Location = new Point(12, 352);
             lbl_infoSpace.Name = "lbl_infoSpace";
-            lbl_infoSpace.Size = new Size(0, 13);
+            lbl_infoSpace.Size = new Size(100, 13);
             lbl_infoSpace.TabIndex = 6;
+            lbl_infoSpace.Text = "Max hiding space:";
             // 
             // Form1
             // 

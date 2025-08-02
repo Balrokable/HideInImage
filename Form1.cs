@@ -43,13 +43,15 @@ namespace HideInImage
                 }
 
                 lbl_status.Text = "image uploaded";
-                //lbl_infoSpace.Text = EstimateAvailableSpace();
+                lbl_infoSpace.Text = EstimateAvailableSpace();
             }
         }
 
         private string EstimateAvailableSpace()
         {
-           return "Max ~" + (currentImageBitmap.Height * currentImageBitmap.Width / 8).ToString() + " Chars"; 
+            int maxBytes = ((currentImageBitmap.Height * currentImageBitmap.Width * 3) -3) / 8;
+
+            return "Max hiding space: \n~" + (maxBytes / 1024) + " KB";
         }
 
         private void btn_inject_Click(object sender, EventArgs e)
@@ -91,6 +93,6 @@ namespace HideInImage
 
             textBoxMultiline.Text = bc.ConvertBitArrayToString(hdc.ExtractDataFromCurrentImage(currentImageBitmap));
             lbl_status.Text = "Data extracted";
-        }        
+        }
     }
 }
