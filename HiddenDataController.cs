@@ -138,7 +138,7 @@ namespace HideInImage
             return red[7].ToString() + green[7] + blue[7];
         }
 
-        private bool CurrentImageHasWatermark(Bitmap currentImageBitmap)
+        public bool CurrentImageHasWatermark(Bitmap currentImageBitmap)
         {
             for (int i = 0; i < currentImageBitmap.Height; i++)
             {

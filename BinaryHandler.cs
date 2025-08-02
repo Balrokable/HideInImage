@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace HideInImage
 {
-    internal class BinaryConverter
+    internal class BinaryHandler
     {
-        public BinaryConverter() { }
+        public BinaryHandler() { }
 
         public BitArray ConvertStringToBitArray(string input)
         {
@@ -26,6 +26,11 @@ namespace HideInImage
             input.CopyTo(bytes, 0);
 
             return Encoding.UTF8.GetString(bytes);
+        }
+
+        public string CheckBitArrayForMagicNumber(BitArray input)
+        {
+            return "";
         }
     }
 }
